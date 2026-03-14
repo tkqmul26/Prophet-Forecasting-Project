@@ -1,0 +1,128 @@
+---
+title: "MTH6139 Time Series"
+subtitle: "Coursework 1 – Prophet Forecasting Project"
+author: "Muhammad Taha Khan"
+date: "March 12, 2026"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: spacelab
+    highlight: tango
+---
+
+# 1 Introduction
+
+The aim of this project is to analyze a given time series data set and forecast it using the Prophet Forecasting System developed by Meta.
+
+The data set used in this project is the built-in data set **co2** available in R. The data set represents monthly atmospheric carbon dioxide concentrations observed at Mauna Loa Observatory in Hawaii.
+
+---
+
+# 2 Exploring the Dataset
+
+```{r}
+data(co2)
+
+start(co2)
+end(co2)
+frequency(co2)
+```
+
+The dataset begins in 1959 and contains monthly observations of atmospheric CO₂ levels.
+
+---
+
+# 3 Visualising the Time Series
+
+```{r}
+plot(co2,
+     main = "Atmospheric CO2 Concentration",
+     xlab = "Year",
+     ylab = "CO2 (ppm)")
+```
+
+The plot shows a clear upward trend in atmospheric carbon dioxide levels along with a repeating seasonal pattern.
+
+---
+
+# 4 Preparing the Data for Prophet
+
+```{r}
+library(prophet)
+library(zoo)
+
+time_values <- time(co2)
+date_values <- as.Date(as.yearmon(time_values))
+
+co2_dataframe <- data.frame(
+  ds = date_values,
+  y = as.numeric(co2)
+)
+
+head(co2_dataframe)
+```
+
+Prophet requires the data to be stored in a dataframe with two columns: **ds** (date) and **y** (value).
+
+---
+
+# 5 Building the Prophet Model
+
+```{r}
+prophet_model <- prophet(co2_dataframe)
+```
+
+Prophet automatically detects long-term trends and seasonal patterns.
+
+---
+
+# 6 Forecasting Future Values
+
+```{r}
+future_dates <- make_future_dataframe(prophet_model,
+                                      periods = 24,
+                                      freq = "month")
+
+forecast_results <- predict(prophet_model, future_dates)
+
+head(forecast_results)
+```
+
+The model forecasts CO₂ levels for the next 24 months.
+
+---
+
+# 7 Forecast Plot
+
+```{r}
+plot(prophet_model, forecast_results)
+```
+
+The dark line represents predicted values, while the shaded region represents uncertainty intervals.
+
+---
+
+# 8 Model Components
+
+```{r}
+prophet_plot_components(prophet_model, forecast_results)
+```
+
+This shows the trend and seasonal components of the model.
+
+---
+
+# 9 Conclusion
+
+This project used the Prophet forecasting system to analyze the atmospheric CO₂ data. The data has a strong upward trend and clear yearly seasonality. The forecast indicates that CO₂ levels will continue to rise if the current trends persist.
+
+---
+
+# References
+
+Prophet Documentation  
+https://facebook.github.io/prophet/
+
+R Markdown Documentation  
+https://rmarkdown.rstudio.com
